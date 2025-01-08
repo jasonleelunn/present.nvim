@@ -22,4 +22,6 @@ Or use `:PresentStart` Command
 
 # Acknowledgements
 
-teej_dv
+Inspired by and adapted from @tjdevries ["Neovim Plugin from Scratch" YouTube series](https://www.youtube.com/watch?v=VGid4aN25iI&list=PLep05UYkc6wTyBe7kPjQFWVXTlhKeQejM&index=18)
+
+See also [tjdevries/present.nvim](https://github.com/tjdevries/present.nvim)
