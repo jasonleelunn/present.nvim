@@ -23,7 +23,7 @@ local state = {
       execute_code_blocks = "X",
       previous_slide = "p",
       next_slide = "n",
-      quit_presentation = "q",
+      end_presentation = "q",
     },
   },
   slides = {},
@@ -239,8 +239,8 @@ M.start_presentation = function(opts)
     set_slide_content(state.current_slide)
   end)
 
-  set_presentation_keymap("n", keymaps.quit_presentation, function()
-    vim.api.nvim_win_close(state.floats.body.win, true)
+  set_presentation_keymap("n", keymaps.end_presentation, function()
+    M.end_presentation()
   end)
 
   set_presentation_keymap("n", keymaps.execute_code_blocks, function()
@@ -307,6 +307,10 @@ M.start_presentation = function(opts)
   })
 
   set_slide_content(state.current_slide)
+end
+
+M.end_presentation = function()
+  vim.api.nvim_win_close(state.floats.body.win, true)
 end
 
 ---@param config present.Config | nil
