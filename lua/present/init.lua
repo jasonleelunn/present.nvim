@@ -320,6 +320,7 @@ M.setup = function(config)
 end
 
 -- NOTE: expose for testing
+M._state = state
 M._parse_lines = parse_lines
 
 return M
