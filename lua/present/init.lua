@@ -16,6 +16,10 @@ local M = {}
 ---@field presentation_vim_options table?: Table of vim options to set during presentation mode, see :help option-list
 ---@field separators string[]?: The list of patterns to use to find slide boundaries/titles
 
+---@class present.StartOptions
+---@field bufnr number?: Buffer number containing slides to present. Defaults to the current buffer `0`
+---@field filepath string?: The path to file containing slides to present. Takes precedence over `buffer_number`
+
 local state = {
   config = {
     hide_separator_in_title = true,
@@ -215,6 +219,7 @@ local parse_lines = function(lines)
   return slides
 end
 
+---@param opts present.StartOptions | nil
 M.start_presentation = function(opts)
   opts = opts or {}
   opts.bufnr = opts.bufnr or 0
