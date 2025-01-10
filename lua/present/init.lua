@@ -219,10 +219,22 @@ M.start_presentation = function(opts)
   opts = opts or {}
   opts.bufnr = opts.bufnr or 0
 
+  if opts.filepath then
+    local file_exists = vim.uv.fs_stat(opts.filepath)
+
+    if not file_exists then
+      local error_msg = string.format("present.nvim: Failed to start, file '%s' not found!", opts.filepath)
+      vim.notify(error_msg, vim.log.ERROR)
+      return
+    end
+
+    -- editing the given filepath updates the current buffer
+    vim.cmd("e " .. opts.filepath)
+  end
+
   local lines = vim.api.nvim_buf_get_lines(opts.bufnr, 0, -1, false)
   state.slides = parse_lines(lines)
   state.current_slide = 1
-  -- TODO: allow specifying a filepath
   state.title = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(opts.bufnr), ":t")
 
   local windows = create_window_configurations()
