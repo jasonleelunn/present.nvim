@@ -72,4 +72,23 @@ describe("present.setup", function()
       eq(vim.o[option], value)
     end
   end)
+
+  it("should allow overriding the default keymaps", function()
+    local user_config = {
+      keymaps = {
+        next_slide = "l",
+      },
+    }
+
+    setup(user_config)
+
+    start_presentation({ filepath = "tests/test_slides.md" })
+
+    -- should advance to the next slide
+    vim.api.nvim_feedkeys("l", "x", true)
+
+    eq(state.current_slide, 2)
+
+    end_presentation()
+  end)
 end)
