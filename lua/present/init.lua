@@ -318,7 +318,7 @@ M.setup = function(config)
   config = config or {}
   -- opts.executors = opts.executors or {}
 
-  state.config = vim.tbl_extend("force", state.config, config)
+  state.config = vim.tbl_deep_extend("force", state.config, config)
 end
 
 -- NOTE: expose for testing
