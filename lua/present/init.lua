@@ -13,6 +13,7 @@ local M = {}
 
 ---@class present.Config
 ---@field hide_separator_in_title boolean?: TODO: add description
+---@field presentation_vim_options table?: Table of vim options to set during presentation mode, see :help option-list
 ---@field separators string[]?: The list of patterns to use to find slide boundaries/titles
 
 local state = {
@@ -24,6 +25,13 @@ local state = {
       previous_slide = "p",
       next_slide = "n",
       end_presentation = "q",
+    },
+    presentation_vim_options = {
+      cmdheight = 0,
+      conceallevel = 0,
+      hlsearch = false,
+      linebreak = true,
+      wrap = true,
     },
   },
   slides = {},
@@ -247,27 +255,17 @@ M.start_presentation = function(opts)
     execution.execute_slide_blocks(state)
   end)
 
-  local vim_options = {
-    original = {
-      cmdheight = vim.o.cmdheight,
-      conceallevel = vim.o.conceallevel,
-      -- TODO: need to restore the state of hlsearch, not just the option
-      hlsearch = vim.o.hlsearch,
-      linebreak = vim.o.linebreak,
-      wrap = vim.o.wrap,
-    },
-    present = {
-      cmdheight = 0,
-      -- TODO: make all these configurable
-      conceallevel = 2,
-      hlsearch = false,
-      linebreak = true,
-      wrap = true,
-    },
+  local original_vim_options = {
+    cmdheight = vim.o.cmdheight,
+    conceallevel = vim.o.conceallevel,
+    -- TODO: need to restore the state of hlsearch, not just the option
+    hlsearch = vim.o.hlsearch,
+    linebreak = vim.o.linebreak,
+    wrap = vim.o.wrap,
   }
 
   -- Set the options we want during presentation
-  for name, value in pairs(vim_options.present) do
+  for name, value in pairs(state.config.presentation_vim_options) do
     vim.opt[name] = value
   end
 
@@ -278,7 +276,7 @@ M.start_presentation = function(opts)
     group = present_augroup,
     callback = function()
       -- reset the option values when we are done with the presentation
-      for name, value in pairs(vim_options.original) do
+      for name, value in pairs(original_vim_options) do
         vim.opt[name] = value
       end
 
