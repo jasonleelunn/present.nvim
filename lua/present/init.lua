@@ -46,12 +46,6 @@ local state = {
   floats = {},
 }
 
-local function set_presentation_keymap(mode, key, callback)
-  vim.keymap.set(mode, key, callback, {
-    buffer = state.floats.body.buf,
-  })
-end
-
 local function set_slide_content(idx)
   local width = vim.o.columns
 
@@ -65,6 +59,34 @@ local function set_slide_content(idx)
 
   local footer = string.format("  %d / %d | %s", state.current_slide, #state.slides, state.title)
   vim.api.nvim_buf_set_lines(state.floats.footer.buf, 0, -1, false, { footer })
+end
+
+local function set_presentation_keymaps()
+  local function set_keymap(mode, key, callback)
+    vim.keymap.set(mode, key, callback, {
+      buffer = state.floats.body.buf,
+    })
+  end
+
+  local keymaps = state.config.keymaps
+
+  set_keymap("n", keymaps.previous_slide, function()
+    state.current_slide = math.max(state.current_slide - 1, 1)
+    set_slide_content(state.current_slide)
+  end)
+
+  set_keymap("n", keymaps.next_slide, function()
+    state.current_slide = math.min(state.current_slide + 1, #state.slides)
+    set_slide_content(state.current_slide)
+  end)
+
+  set_keymap("n", keymaps.end_presentation, function()
+    M.end_presentation()
+  end)
+
+  set_keymap("n", keymaps.execute_code_blocks, function()
+    execution.execute_slide_blocks(state)
+  end)
 end
 
 ---@param opts present.StartOptions | nil
@@ -92,25 +114,7 @@ M.start_presentation = function(opts)
 
   state.floats = windows.create_floating_windows()
 
-  local keymaps = state.config.keymaps
-
-  set_presentation_keymap("n", keymaps.previous_slide, function()
-    state.current_slide = math.max(state.current_slide - 1, 1)
-    set_slide_content(state.current_slide)
-  end)
-
-  set_presentation_keymap("n", keymaps.next_slide, function()
-    state.current_slide = math.min(state.current_slide + 1, #state.slides)
-    set_slide_content(state.current_slide)
-  end)
-
-  set_presentation_keymap("n", keymaps.end_presentation, function()
-    M.end_presentation()
-  end)
-
-  set_presentation_keymap("n", keymaps.execute_code_blocks, function()
-    execution.execute_slide_blocks(state)
-  end)
+  set_presentation_keymaps()
 
   local original_vim_options = {
     cmdheight = vim.o.cmdheight,
