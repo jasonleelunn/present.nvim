@@ -22,6 +22,12 @@ local state = {
       linebreak = true,
       wrap = true,
     },
+    executors = {
+      javascript = execution.create_system_executor("node"),
+      lua = execution.execute_lua_code,
+      python = execution.create_system_executor("python"),
+      rust = execution.execute_rust_code,
+    },
   },
   active = false,
   slides = {},
@@ -68,7 +74,12 @@ local function set_presentation_keymaps()
   end)
 
   set_keymap("n", keymaps.execute_code_blocks, function()
-    execution.execute_slide_blocks(state)
+    local blocks = state.slides[state.current_slide].blocks
+
+    for _, block in pairs(blocks) do
+      local executor = state.config.executors[block.language]
+      execution.execute_slide_block(block, executor)
+    end
   end)
 end
 
@@ -164,10 +175,11 @@ end
 ---@param config present.Config | nil
 M.setup = function(config)
   config = config or {}
-  -- opts.executors = opts.executors or {}
 
   state.config = vim.tbl_deep_extend("force", state.config, config)
 end
+
+M.create_system_executor = execution.create_system_executor
 
 -- NOTE: expose for testing
 M._state = state

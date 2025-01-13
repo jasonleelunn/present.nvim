@@ -1,8 +1,8 @@
 local M = {}
 
---- Default executor for lua code
+--- Default executor for Lua code
 ---@param block present.Block
-local execute_lua_code = function(block)
+M.execute_lua_code = function(block)
   -- Override the default print function, to capture all of the output
   -- Store the original print function
   local original_print = print
@@ -20,7 +20,7 @@ local execute_lua_code = function(block)
   local chunk = loadstring(block.body)
   pcall(function()
     if not chunk then
-      table.insert(output, " <<<BROKEN CODE>>>")
+      table.insert(output, "Error: Failed to execute Lua code block")
     else
       chunk()
     end
@@ -36,44 +36,61 @@ end
 
 --- Default executor for Rust code
 ---@param block present.Block
-local execute_rust_code = function(block)
+M.execute_rust_code = function(block)
   local tempfile = vim.fn.tempname() .. ".rs"
   local outputfile = tempfile:sub(1, -4)
+
   vim.fn.writefile(vim.split(block.body, "\n"), tempfile)
-  local result = vim.system({ "rustc", tempfile, "-o", outputfile }, { text = true }):wait()
-  if result.code ~= 0 then
-    local output = vim.split(result.stderr, "\n")
+
+  local compile_result = vim.system({ "rustc", tempfile, "-o", outputfile }, { text = true }):wait()
+
+  if compile_result.code ~= 0 then
+    local output = vim.split(compile_result.stderr, "\n")
     return output
   end
-  result = vim.system({ outputfile }, { text = true }):wait()
-  return vim.split(result.stdout, "\n")
+
+  local runtime_result = vim.system({ outputfile }, { text = true }):wait()
+
+  if #runtime_result.stderr > 0 then
+    return vim.split(runtime_result.stderr, "\n")
+  end
+
+  return vim.split(runtime_result.stdout, "\n")
 end
 
+---@param program string
+---@return present.Executor
 M.create_system_executor = function(program)
+  ---@param block present.Block
   return function(block)
     local tempfile = vim.fn.tempname()
     vim.fn.writefile(vim.split(block.body, "\n"), tempfile)
+
     local result = vim.system({ program, tempfile }, { text = true }):wait()
+
+    if #result.stderr > 0 then
+      return vim.split(result.stderr, "\n")
+    end
+
     return vim.split(result.stdout, "\n")
   end
 end
 
-M.execute_slide_blocks = function(state)
-  local slide = state.parsed.slides[state.current_slide]
-  -- TODO: Make a way for people to execute this for other languages
-  local block = slide.blocks[1]
+---@param block present.Block
+---@param executor present.Executor
+M.execute_slide_block = function(block, executor)
   if not block then
-    print("No blocks on this page")
+    print("No code blocks found on this slide")
     return
   end
 
-  local executor = options.executors[block.language]
   if not executor then
-    print("No valid executor for this language")
+    print("No valid executor configured for this language")
     return
   end
 
-  -- Table to capture print messages
+  local execution_result = executor(block)
+
   local output = { "# Code", "", "```" .. block.language }
   vim.list_extend(output, vim.split(block.body, "\n"))
   table.insert(output, "```")
@@ -81,35 +98,25 @@ M.execute_slide_blocks = function(state)
   table.insert(output, "")
   table.insert(output, "# Output")
   table.insert(output, "")
-  table.insert(output, "```")
-  vim.list_extend(output, executor(block))
-  table.insert(output, "```")
+  vim.list_extend(output, execution_result)
 
   local buf = vim.api.nvim_create_buf(false, true) -- No file, scratch buffer
-  local temp_width = math.floor(vim.o.columns * 0.8)
-  local temp_height = math.floor(vim.o.lines * 0.8)
+  local width = math.floor(vim.o.columns * 0.8)
+  local height = math.floor(vim.o.lines * 0.8)
+
   vim.api.nvim_open_win(buf, true, {
     relative = "editor",
     style = "minimal",
-    noautocmd = true,
-    width = temp_width,
-    height = temp_height,
-    row = math.floor((vim.o.lines - temp_height) / 2),
-    col = math.floor((vim.o.columns - temp_width) / 2),
     border = "rounded",
+    noautocmd = true,
+    width = width,
+    height = height,
+    row = math.floor((vim.o.lines - height) / 2),
+    col = math.floor((vim.o.columns - width) / 2),
   })
 
   vim.bo[buf].filetype = "markdown"
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
 end
-
--- local options = {
---   executors = {
---     lua = execute_lua_code,
---     javascript = M.create_system_executor("node"),
---     python = M.create_system_executor("python"),
---     rust = execute_rust_code,
---   },
--- }
 
 return M
