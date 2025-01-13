@@ -8,3 +8,7 @@ vim.api.nvim_create_user_command("PresentStart", function(context)
     start()
   end
 end, { complete = "file", nargs = "?" })
+
+vim.api.nvim_create_user_command("PresentEnd", function()
+  require("present").end_presentation()
+end, {})
