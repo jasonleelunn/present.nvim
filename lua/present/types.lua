@@ -18,4 +18,4 @@
 
 ---@class present.StartOptions
 ---@field bufnr number?: Buffer number containing slides to present. Defaults to the current buffer `0`
----@field filepath string?: The path to file containing slides to present. Takes precedence over `buffer_number`
+---@field filepath string?: The path to file containing slides to present. Takes precedence over `bufnr`
