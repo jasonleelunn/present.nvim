@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global
+
 local state = require("present")._state
 local setup = require("present").setup
 local start_presentation = require("present").start_presentation
