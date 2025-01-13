@@ -13,6 +13,8 @@ local state = {
       execute_code_blocks = "X",
       previous_slide = "p",
       next_slide = "n",
+      first_slide = "f",
+      last_slide = "e",
       end_presentation = "q",
     },
     presentation_vim_options = {
@@ -67,6 +69,16 @@ local function set_presentation_keymaps()
 
   set_keymap("n", keymaps.next_slide, function()
     state.current_slide = math.min(state.current_slide + 1, #state.slides)
+    set_slide_content(state.current_slide)
+  end)
+
+  set_keymap("n", keymaps.first_slide, function()
+    state.current_slide = 1
+    set_slide_content(state.current_slide)
+  end)
+
+  set_keymap("n", keymaps.last_slide, function()
+    state.current_slide = #state.slides
     set_slide_content(state.current_slide)
   end)
 
