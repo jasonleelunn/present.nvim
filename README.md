@@ -12,13 +12,15 @@ require("present").setup({
 })
 ```
 
-Start a presentation from the current buffer by calling `start_presentation` with no arguments;
+Start a presentation from the current buffer by calling `start_presentation` with no arguments, or optionally pass a table with a `filepath` field to present a specific file;
 
 ```lua
-require("present").start_presentation()
+require("present").start_presentation({
+    filepath = "/path/to/file.md" -- optional argument
+})
 ```
 
-or just run the `:PresentStart` command
+or just run the `:PresentStart <filepath?>` command, optionally passing a filepath to present
 
 # Live Code Block Execution
 
