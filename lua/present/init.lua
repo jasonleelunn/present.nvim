@@ -23,6 +23,7 @@ local state = {
       wrap = true,
     },
     executors = {
+      go = execution.execute_go_code,
       javascript = execution.create_system_executor("node"),
       lua = execution.execute_lua_code,
       python = execution.create_system_executor("python"),

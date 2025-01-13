@@ -1,5 +1,28 @@
 local M = {}
 
+--- Default executor for Go code
+---@param block present.Block
+M.execute_go_code = function(block)
+  local tempfile = vim.fn.tempname() .. ".go"
+  local outputfile = tempfile:sub(1, -4)
+
+  vim.fn.writefile(vim.split(block.body, "\n"), tempfile)
+
+  local compile_result = vim.system({ "go", "build", "-o", outputfile, tempfile }, { text = true }):wait()
+
+  if compile_result.code ~= 0 then
+    return vim.split(compile_result.stderr, "\n")
+  end
+
+  local runtime_result = vim.system({ outputfile }, { text = true }):wait()
+
+  if #runtime_result.stderr > 0 then
+    return vim.split(runtime_result.stderr, "\n")
+  end
+
+  return vim.split(runtime_result.stdout, "\n")
+end
+
 --- Default executor for Lua code
 ---@param block present.Block
 M.execute_lua_code = function(block)
@@ -45,8 +68,7 @@ M.execute_rust_code = function(block)
   local compile_result = vim.system({ "rustc", tempfile, "-o", outputfile }, { text = true }):wait()
 
   if compile_result.code ~= 0 then
-    local output = vim.split(compile_result.stderr, "\n")
-    return output
+    return vim.split(compile_result.stderr, "\n")
   end
 
   local runtime_result = vim.system({ outputfile }, { text = true }):wait()
