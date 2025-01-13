@@ -93,6 +93,18 @@ These keymaps are active in normal mode when presenting a file. You can customis
 | `q` | quit the presentation                |
 | `X` | execute the code blocks on the slide |
 
+# Developing locally
+
+- This project requires the following development dependencies to be installed:
+  - [`just`](https://github.com/casey/just) (command runner)
+  - [`watchexec`](https://github.com/watchexec/watchexec) (file watcher)
+  - [`plenary.nvim`](https://github.com/nvim-lua/plenary.nvim) plugin/library for testing
+    - the plenary repo must be cloned as a sibling directory to this repo by default, i.e. available at `../plenary.nvim/`
+    - alternatively the `PLENARY_NVIM_DIR` env var can be set to provide a different location on your system
+- Run the entire test suite with `just test`
+- Run the entire test suite in watch mode with `just test-watch`
+- Run `just --list` for optional arguments and more info
+
 # Acknowledgements
 
 Inspired by and adapted from @tjdevries ["Neovim Plugin from Scratch" YouTube series](https://www.youtube.com/watch?v=VGid4aN25iI&list=PLep05UYkc6wTyBe7kPjQFWVXTlhKeQejM&index=18)
