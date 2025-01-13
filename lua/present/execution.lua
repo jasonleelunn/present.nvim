@@ -58,15 +58,15 @@ M.execute_rust_code = function(block)
   return vim.split(runtime_result.stdout, "\n")
 end
 
----@param program string
+---@param command string
 ---@return present.Executor
-M.create_system_executor = function(program)
+M.create_system_executor = function(command)
   ---@param block present.Block
   return function(block)
     local tempfile = vim.fn.tempname()
     vim.fn.writefile(vim.split(block.body, "\n"), tempfile)
 
-    local result = vim.system({ program, tempfile }, { text = true }):wait()
+    local result = vim.system({ command, tempfile }, { text = true }):wait()
 
     if #result.stderr > 0 then
       return vim.split(result.stderr, "\n")
@@ -74,49 +74,6 @@ M.create_system_executor = function(program)
 
     return vim.split(result.stdout, "\n")
   end
-end
-
----@param block present.Block
----@param executor present.Executor
-M.execute_slide_block = function(block, executor)
-  if not block then
-    print("No code blocks found on this slide")
-    return
-  end
-
-  if not executor then
-    print("No valid executor configured for this language")
-    return
-  end
-
-  local execution_result = executor(block)
-
-  local output = { "# Code", "", "```" .. block.language }
-  vim.list_extend(output, vim.split(block.body, "\n"))
-  table.insert(output, "```")
-
-  table.insert(output, "")
-  table.insert(output, "# Output")
-  table.insert(output, "")
-  vim.list_extend(output, execution_result)
-
-  local buf = vim.api.nvim_create_buf(false, true) -- No file, scratch buffer
-  local width = math.floor(vim.o.columns * 0.8)
-  local height = math.floor(vim.o.lines * 0.8)
-
-  vim.api.nvim_open_win(buf, true, {
-    relative = "editor",
-    style = "minimal",
-    border = "rounded",
-    noautocmd = true,
-    width = width,
-    height = height,
-    row = math.floor((vim.o.lines - height) / 2),
-    col = math.floor((vim.o.columns - width) / 2),
-  })
-
-  vim.bo[buf].filetype = "markdown"
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
 end
 
 return M

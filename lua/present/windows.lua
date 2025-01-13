@@ -15,6 +15,10 @@ local function create_window_configurations()
   local body_height = full_height - header_height - footer_height - 2 -- account for the body border top and bottom
   local body_width = full_width - horizontal_body_padding * 2 -- pad left and right of body text
 
+  -- TODO: make configurable
+  local execution_height = math.floor(full_height * 0.8)
+  local execution_width = math.floor(full_width * 0.8)
+
   return {
     background = {
       relative = "editor",
@@ -55,6 +59,17 @@ local function create_window_configurations()
       zindex = 3,
       style = "minimal",
     },
+    execution = {
+      relative = "editor",
+      width = execution_width,
+      height = execution_height,
+      col = math.floor((full_width - execution_width) / 2),
+      row = math.floor((full_height - execution_height) / 2),
+      zindex = 4,
+      style = "minimal",
+      border = "rounded",
+      noautocmd = true,
+    },
   }
 end
 
@@ -92,6 +107,14 @@ M.update_floating_windows = function(floats)
   utils.foreach(floats, function(name, float)
     vim.api.nvim_win_set_config(float.win, updated[name])
   end)
+end
+
+M.create_execution_result_window = function(text)
+  local windows = create_window_configurations()
+  local float = create_floating_window(windows.execution, true)
+
+  vim.bo[float.buf].filetype = "markdown"
+  vim.api.nvim_buf_set_lines(float.buf, 0, -1, false, text)
 end
 
 return M

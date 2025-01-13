@@ -75,12 +75,31 @@ local function set_presentation_keymaps()
 
   set_keymap("n", keymaps.execute_code_blocks, function()
     local blocks = state.slides[state.current_slide].blocks
+    local execution_results = {}
 
     for _, block in pairs(blocks) do
       local executor = state.config.executors[block.language]
-      execution.execute_slide_block(block, executor)
+
+      table.insert(execution_results, { block = block, output = executor(block) })
     end
+
+    local formatted_output = M.format_execution_output(execution_results)
+    windows.create_execution_result_window(formatted_output)
   end)
+end
+
+---@param execution_results present.ExecutionResult[]
+---@return string[]
+M.format_execution_output = function(execution_results)
+  local formatted_output = {}
+
+  utils.foreach(execution_results, function(_, result)
+    local text = { "", "# Output " .. "(" .. result.block.language .. ")", "" }
+    vim.list_extend(text, result.output)
+    vim.list_extend(formatted_output, text)
+  end)
+
+  return formatted_output
 end
 
 ---@param opts present.StartOptions | nil

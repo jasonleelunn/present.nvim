@@ -8,6 +8,7 @@
 ---@field body string: The body of the codeblock
 
 ---@alias present.Executor fun(block: present.Block): string[]
+---@alias present.ExecutionResult { block: present.Block, output: string[] }
 
 ---@class present.Config
 ---@field executors { [string]: present.Executor }?: Table of language execution functions
