@@ -30,6 +30,21 @@ print("Hello world!")
 
 and the result will be displayed in a floating window
 
+- Execution functions are provided for `lua`, `go`, `rust`, `python`, and `javascript` by default
+- You can add your own to the `executors` table in the `setup` config table
+- The default executors may not be compatible with your system and you may need to write a custom executor to execute code on your system. See `lua/present/execution.lua` for example implementations
+- For interpreted languages, you can use the `create_system_executor` utility function provided by `present.nvim` to easily create a new executor;
+
+```lua
+local present = require("present")
+
+present.setup({
+    executors = {
+        ruby = present.create_system_executor("ruby")
+    }
+})
+```
+
 # Keymaps
 
 These keymaps are active in normal mode when presenting a file. You can customise them using the `keymaps` table in the config table passed to `setup`
