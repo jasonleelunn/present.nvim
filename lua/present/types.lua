@@ -12,7 +12,7 @@
 
 ---@class present.Config
 ---@field executors { [string]: present.Executor }?: Table of language execution functions
----@field hide_separator_in_title boolean?: TODO: add description
+---@field hide_separator_in_title boolean?: Whether to remove the separator char(s) from the slide header
 ---@field presentation_vim_options table?: Table of vim options to set during presentation mode, see :help option-list
 ---@field separators string[]?: The list of patterns to use to find slide boundaries/titles
 
