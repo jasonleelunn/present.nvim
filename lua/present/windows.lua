@@ -16,8 +16,8 @@ local function create_window_configurations()
   local body_width = full_width - horizontal_body_padding * 2 -- pad left and right of body text
 
   -- TODO: make configurable
-  local execution_height = math.floor(full_height * 0.8)
-  local execution_width = math.floor(full_width * 0.8)
+  local execution_height = math.floor(full_height * 0.5)
+  local execution_width = math.floor(full_width * 0.6)
 
   return {
     background = {
