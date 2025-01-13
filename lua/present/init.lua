@@ -23,6 +23,7 @@ local state = {
       wrap = true,
     },
   },
+  active = false,
   slides = {},
   current_slide = 1,
   floats = {},
@@ -73,6 +74,10 @@ end
 
 ---@param opts present.StartOptions | nil
 M.start_presentation = function(opts)
+  if state.active then
+    return
+  end
+
   opts = opts or {}
   opts.bufnr = opts.bufnr or 0
 
@@ -126,6 +131,8 @@ M.start_presentation = function(opts)
       utils.foreach(state.floats, function(_, float)
         pcall(vim.api.nvim_win_close, float.win, true)
       end)
+
+      state.active = false
     end,
   })
 
@@ -144,10 +151,14 @@ M.start_presentation = function(opts)
   })
 
   set_slide_content(state.current_slide)
+
+  state.active = true
 end
 
 M.end_presentation = function()
   vim.api.nvim_win_close(state.floats.body.win, true)
+
+  state.active = false
 end
 
 ---@param config present.Config | nil
