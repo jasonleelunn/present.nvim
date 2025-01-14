@@ -1,0 +1,156 @@
+*present.nvim.txt*         For NVIM v0.8.0        Last change: 2025 January 14
+
+==============================================================================
+Table of Contents                             *present.nvim-table-of-contents*
+
+1. present.nvim                                    |present.nvim-present.nvim|
+2. Usage                                                  |present.nvim-usage|
+3. Configuration                                  |present.nvim-configuration|
+4. Live Code Block Execution          |present.nvim-live-code-block-execution|
+5. Keymaps                                              |present.nvim-keymaps|
+6. Developing locally                        |present.nvim-developing-locally|
+7. Acknowledgements                            |present.nvim-acknowledgements|
+8. Links                                                  |present.nvim-links|
+
+==============================================================================
+1. present.nvim                                    *present.nvim-present.nvim*
+
+A Neovim plugin for presenting markdown files as slideshows.
+
+
+==============================================================================
+2. Usage                                                  *present.nvim-usage*
+
+Start a presentation from the current buffer by calling `start_presentation`
+with no arguments, or optionally pass a table with a `filepath` field to
+present a specific file;
+
+>lua
+    require("present").start_presentation({
+        filepath = "/path/to/file.md" -- optional argument
+    })
+<
+
+or just run the `:PresentStart <filepath?>` command, optionally passing a file
+path to present
+
+
+==============================================================================
+3. Configuration                                  *present.nvim-configuration*
+
+Calling the `setup` function is optional if you want to pass any configuation
+options, the following table shows all valid configuration options with their
+default values;
+
+>lua
+    require("present").setup({
+        -- whether the chosen separator character(s) should be removed from the slide header
+        hide_separator_in_title = true,
+        -- a list of lua matching patterns to use as slide boundaries
+        -- lines matching one of these separators will become slide titles in the header
+        separators = { "^# " },
+        -- the normal mode keymaps available while in presentation mode, see the `Keymaps` section below
+        keymaps = {
+          execute_code_blocks = "X",
+          previous_slide = "p",
+          next_slide = "n",
+          first_slide = "f",
+          last_slide = "e",
+          end_presentation = "q",
+        },
+        -- vim options that will be modified when in presentation mode
+        -- you can pass any valid vim options here to customise how presentation mode behaves
+        -- see :help option-list to see all valid fields for this table
+        presentation_vim_options = {
+          cmdheight = 0,
+          conceallevel = 0,
+          hlsearch = false,
+          linebreak = true,
+          wrap = true,
+        },
+        -- the default code executors available, see the `Live Code Block Execution` section below
+        executors = {
+          go = execution.execute_go_code,
+          javascript = execution.create_system_executor("node"),
+          lua = execution.execute_lua_code,
+          python = execution.create_system_executor("python"),
+          rust = execution.execute_rust_code,
+        },
+    })
+<
+
+
+==============================================================================
+4. Live Code Block Execution          *present.nvim-live-code-block-execution*
+
+You can execute code inside markdown code blocks on a slide, e.g.
+
+>lua
+    print("Hello world!")
+<
+
+and the result will be displayed in a floating window
+
+- Execution functions are provided for `lua`, `go`, `rust`, `python`, and `javascript` by default
+- You can add your own to the `executors` table in the `setup` config table
+- The default executors may not be compatible with your system and you may need to write a custom executor. See `lua/present/execution.lua` for example implementations
+- For interpreted languages, you can use the `create_system_executor` utility function provided by `present.nvim` to easily create a new executor;
+
+>lua
+    local present = require("present")
+    
+    present.setup({
+        executors = {
+            ruby = present.create_system_executor("ruby")
+        }
+    })
+<
+
+
+==============================================================================
+5. Keymaps                                              *present.nvim-keymaps*
+
+These keymaps are active in normal mode when presenting a file. You can
+customise them using the `keymaps` table in the config table passed to `setup`
+(see |present.nvim-configuration| above)
+
+  key   description
+  ----- --------------------------------------
+  p     move to the previous slide
+  n     move to the next slide
+  f     move to the first slide
+  e     move to the last slide
+  q     quit the presentation
+  X     execute the code blocks on the slide
+
+==============================================================================
+6. Developing locally                        *present.nvim-developing-locally*
+
+- This project requires the following development dependencies to be installed:
+    - `just` <https://github.com/casey/just> (command runner)
+    - `watchexec` <https://github.com/watchexec/watchexec> (file watcher)
+    - `plenary.nvim` <https://github.com/nvim-lua/plenary.nvim> plugin/library for testing
+        - the plenary repo must be cloned as a sibling directory to this repo by default, i.e. available at `../plenary.nvim/`
+        - alternatively the `PLENARY_NVIM_DIR` env var can be set to provide a different location on your system
+- Run the entire test suite with `just test`
+- Run the entire test suite in watch mode with `just test-watch`
+- Run `just --list` for optional arguments and more info
+
+
+==============================================================================
+7. Acknowledgements                            *present.nvim-acknowledgements*
+
+Inspired by and adapted from @tjdevries "Neovim Plugin from Scratch" YouTube
+series
+<https://www.youtube.com/watch?v=VGid4aN25iI&list=PLep05UYkc6wTyBe7kPjQFWVXTlhKeQejM&index=18>
+
+See also tjdevries/present.nvim <https://github.com/tjdevries/present.nvim>
+
+==============================================================================
+8. Links                                                  *present.nvim-links*
+
+1. *@tjdevries*: 
+
+Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
+
+vim:tw=78:ts=8:noet:ft=help:norl:
