@@ -1,4 +1,4 @@
-*present.nvim.txt*         For NVIM v0.8.0        Last change: 2025 January 14
+*present.nvim.txt*        For NVIM v0.10.0        Last change: 2025 January 14
 
 ==============================================================================
 Table of Contents                             *present.nvim-table-of-contents*
