@@ -16,7 +16,7 @@ or just run the `:PresentStart <filepath?>` command, optionally passing a file p
 
 # Configuration
 
-Calling the `setup` function is optional if you want to pass any configuation options, the following table shows all valid configuration options with their default values;
+Calling the `setup` function is optional if you want to pass any configuration options, the following table shows all valid configuration options with their default values;
 
 ```lua
 require("present").setup({
