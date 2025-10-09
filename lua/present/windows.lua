@@ -96,6 +96,7 @@ M.create_floating_windows = function()
 
   utils.foreach(floats, function(_, float)
     vim.bo[float.buf].filetype = "markdown"
+    vim.wo[float.win].spell = false
   end)
 
   return floats
