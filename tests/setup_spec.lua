@@ -93,4 +93,25 @@ describe("present.setup", function()
 
     end_presentation()
   end)
+
+  it("should allow partial overriding of the footer config table", function()
+    local left_text = "foo bar baz"
+
+    local user_config = {
+      footer = {
+        left_text = left_text,
+      },
+    }
+
+    setup(user_config)
+
+    start_presentation({ filepath = "tests/test_slides.md" })
+
+    eq(state.config.footer, {
+      left_text = left_text,
+      right_text = nil,
+    })
+
+    end_presentation()
+  end)
 end)
