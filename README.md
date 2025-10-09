@@ -25,6 +25,15 @@ require("present").setup({
     -- a list of lua matching patterns to use as slide boundaries
     -- lines matching one of these separators will become slide titles in the header
     separators = { "^# " },
+    -- options to control the text displayed in the footer
+    footer = {
+      -- the text displayed on the left side of the footer, defaults to the format shown
+      -- set this equal to an empty string for no text
+      left_text = "<current_slide_number> / <total_slide_count> | <filename>",
+      -- the text displayed on the right side of the footer, defaults to the current date in the format shown
+      -- set this equal to an empty string for no text
+      right_text = "YYYY-MM-DD",
+    },
     -- the normal mode keymaps available while in presentation mode, see the `Keymaps` section below
     keymaps = {
       execute_code_blocks = "X",

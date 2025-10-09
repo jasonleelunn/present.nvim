@@ -9,6 +9,10 @@ local state = {
   config = {
     hide_separator_in_title = true,
     separators = { "^# " },
+    footer = {
+      left_text = nil,
+      right_text = nil,
+    },
     keymaps = {
       execute_code_blocks = "X",
       previous_slide = "p",
@@ -49,8 +53,21 @@ local function set_slide_content(idx)
 
   vim.api.nvim_buf_set_lines(state.floats.body.buf, 0, -1, false, slide.body)
 
-  local footer = string.format("  %d / %d | %s", state.current_slide, #state.slides, state.title)
-  vim.api.nvim_buf_set_lines(state.floats.footer.buf, 0, -1, false, { footer })
+  local left_footer_text = state.config.footer.left_text
+    or string.format("%d / %d | %s", state.current_slide, #state.slides, state.title)
+
+  local right_footer_text = state.config.footer.right_text or string.format("%s", os.date("%Y-%m-%d"))
+
+  local side_footer_padding = "  "
+  local central_footer_padding =
+    string.rep(" ", (width - #left_footer_text - #right_footer_text - #side_footer_padding * 2))
+
+  local footer_text = side_footer_padding
+    .. left_footer_text
+    .. central_footer_padding
+    .. right_footer_text
+    .. side_footer_padding
+  vim.api.nvim_buf_set_lines(state.floats.footer.buf, 0, -1, false, { footer_text })
 end
 
 local function set_presentation_keymaps()
