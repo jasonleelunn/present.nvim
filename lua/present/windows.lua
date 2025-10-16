@@ -67,7 +67,7 @@ local function create_window_configurations()
       row = math.floor((full_height - execution_height) / 2),
       zindex = 4,
       style = "minimal",
-      border = "rounded",
+      border = "bold",
       noautocmd = true,
     },
   }
