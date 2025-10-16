@@ -115,6 +115,7 @@ M.create_execution_result_window = function(text)
   local float = create_floating_window(windows.execution, true)
 
   vim.bo[float.buf].filetype = "markdown"
+  vim.wo[float.win].spell = false
   vim.api.nvim_buf_set_lines(float.buf, 0, -1, false, text)
 end
 
