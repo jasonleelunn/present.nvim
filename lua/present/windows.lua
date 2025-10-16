@@ -2,6 +2,8 @@ local utils = require("present.utils")
 
 local M = {}
 
+local intro_float_width = 0
+
 local function create_window_configurations()
   local full_width = vim.o.columns
   local full_height = vim.o.lines
@@ -14,6 +16,8 @@ local function create_window_configurations()
 
   local body_height = full_height - header_height - footer_height - 2 -- account for the body border top and bottom
   local body_width = full_width - horizontal_body_padding * 2 -- pad left and right of body text
+
+  local intro_height = 3 -- presentation title + a blank line above and below
 
   -- TODO: make configurable
   local execution_height = math.floor(full_height * 0.5)
@@ -59,6 +63,16 @@ local function create_window_configurations()
       zindex = 3,
       style = "minimal",
     },
+    intro = {
+      relative = "editor",
+      width = intro_float_width,
+      height = intro_height,
+      col = math.floor((full_width - intro_float_width) / 2),
+      row = math.floor((full_height - intro_height) / 2),
+      zindex = 3,
+      style = "minimal",
+      border = "double",
+    },
     execution = {
       relative = "editor",
       width = execution_width,
@@ -73,6 +87,7 @@ local function create_window_configurations()
   }
 end
 
+---@return present.Float
 local function create_floating_window(config, enter)
   if enter == nil then
     enter = false
@@ -84,6 +99,7 @@ local function create_floating_window(config, enter)
   return { buf = buf, win = win }
 end
 
+---@return present.Floats
 M.create_floating_windows = function()
   local floats = {}
 
@@ -93,6 +109,7 @@ M.create_floating_windows = function()
   floats.header = create_floating_window(windows.header)
   floats.footer = create_floating_window(windows.footer)
   floats.body = create_floating_window(windows.body, true)
+  floats.intro = create_floating_window(windows.intro)
 
   utils.foreach(floats, function(_, float)
     vim.bo[float.buf].filetype = "markdown"
@@ -102,12 +119,21 @@ M.create_floating_windows = function()
   return floats
 end
 
-M.update_floating_windows = function(floats)
+---@param floats present.Floats
+M.resize_floating_windows = function(floats)
   local updated = create_window_configurations()
 
   utils.foreach(floats, function(name, float)
     vim.api.nvim_win_set_config(float.win, updated[name])
   end)
+end
+
+---@param floats present.Floats
+---@param is_intro boolean
+M.update_shown_floating_windows = function(floats, is_intro)
+  vim.api.nvim_win_set_config(floats.header.win, { hide = is_intro })
+  vim.api.nvim_win_set_config(floats.body.win, { hide = is_intro })
+  vim.api.nvim_win_set_config(floats.intro.win, { hide = not is_intro })
 end
 
 M.create_execution_result_window = function(text)
@@ -118,5 +144,12 @@ M.create_execution_result_window = function(text)
   vim.wo[float.win].spell = false
   vim.api.nvim_buf_set_lines(float.buf, 0, -1, false, text)
 end
+
+---@param content_length number
+M.set_intro_float_width = function(content_length)
+  intro_float_width = content_length + M.horizontal_intro_padding * 2
+end
+
+M.horizontal_intro_padding = 10
 
 return M

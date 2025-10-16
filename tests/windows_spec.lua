@@ -13,8 +13,8 @@ describe("present.windows", function()
 
     local buffer_ids = vim.api.nvim_list_bufs()
 
-    -- original file buffer + header + footer + background + body
-    eq(#buffer_ids, 5)
+    -- original file buffer + header + footer + background + body + intro
+    eq(#buffer_ids, 6)
 
     for _, buffer_id in ipairs(buffer_ids) do
       eq(vim.bo[buffer_id].filetype, "markdown")

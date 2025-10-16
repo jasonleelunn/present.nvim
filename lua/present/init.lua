@@ -42,19 +42,33 @@ local state = {
   floats = {},
 }
 
-local function set_slide_content(idx)
-  local width = vim.o.columns
+---@param slide present.Slide
+local function set_intro_buffer_content(slide)
+  local title_padding = string.rep(" ", windows.horizontal_intro_padding)
+  local formatted_title = title_padding .. slide.title
 
+  vim.api.nvim_buf_set_lines(state.floats.intro.buf, 1, -1, false, { formatted_title })
+end
+
+local function set_slide_content(idx)
+  local is_intro = idx == 1
+  windows.update_shown_floating_windows(state.floats, is_intro)
+
+  local width = vim.o.columns
   local slide = state.slides[idx]
 
-  local title_padding = string.rep(" ", (width - #slide.title) / 2)
-  local title = title_padding .. slide.title
-  vim.api.nvim_buf_set_lines(state.floats.header.buf, 0, -1, false, { title })
+  if is_intro then
+    set_intro_buffer_content(slide)
+  else
+    local title_padding = string.rep(" ", (width - #slide.title) / 2)
+    local title = title_padding .. slide.title
+    vim.api.nvim_buf_set_lines(state.floats.header.buf, 0, -1, false, { title })
 
-  vim.api.nvim_buf_set_lines(state.floats.body.buf, 0, -1, false, slide.body)
+    vim.api.nvim_buf_set_lines(state.floats.body.buf, 0, -1, false, slide.body)
+  end
 
   local left_footer_text = state.config.footer.left_text
-    or string.format("%d / %d | %s", state.current_slide, #state.slides, state.title)
+    or string.format("%d / %d | %s", state.current_slide, #state.slides, state.presentation_title)
 
   local right_footer_text = state.config.footer.right_text or string.format("%s", os.date("%Y-%m-%d"))
 
@@ -156,8 +170,16 @@ M.start_presentation = function(opts)
 
   local lines = vim.api.nvim_buf_get_lines(opts.bufnr, 0, -1, false)
   state.slides = parsing.parse_lines(lines, state.config)
+
   state.current_slide = 1
-  state.title = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(opts.bufnr), ":t")
+  local filename = vim.api.nvim_buf_get_name(opts.bufnr)
+  -- get just the filename without the extension
+  state.presentation_title = vim.fn.fnamemodify(filename, ":t:r")
+
+  local intro_slide = { title = state.presentation_title, body = {}, blocks = {} }
+  table.insert(state.slides, 1, intro_slide)
+
+  windows.set_intro_float_width(#state.presentation_title)
 
   state.floats = windows.create_floating_windows()
 
@@ -203,7 +225,7 @@ M.start_presentation = function(opts)
         return
       end
 
-      windows.update_floating_windows(state.floats)
+      windows.resize_floating_windows(state.floats)
 
       -- Re-calculates current slide contents
       set_slide_content(state.current_slide)

@@ -7,6 +7,17 @@
 ---@field language string The language of the codeblock
 ---@field body string The body of the codeblock
 
+---@class present.Float
+---@field buf number The buffer ID of the float
+---@field win number The window ID of the float
+
+---@class present.Floats
+---@field background present.Float
+---@field intro present.Float
+---@field header present.Float
+---@field body present.Float
+---@field footer present.Float
+
 ---@alias present.Executor fun(block: present.Block): string[]
 ---@alias present.ExecutionResult { block: present.Block, output: string[] }
 
