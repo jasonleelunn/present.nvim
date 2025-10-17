@@ -2,6 +2,8 @@
 
 A Neovim plugin for presenting markdown files as slideshows.
 
+![present.nvim GIF](./assets/present.gif)
+
 # Usage
 
 Start a presentation from the current buffer by calling `start_presentation` with no arguments, or optionally pass a table with a `filepath` field to present a specific file;
