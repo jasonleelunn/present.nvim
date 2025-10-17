@@ -36,12 +36,13 @@ require("present").setup({
     },
     -- the normal mode keymaps available while in presentation mode, see the `Keymaps` section below
     keymaps = {
-      execute_code_blocks = "X",
       previous_slide = "p",
       next_slide = "n",
       first_slide = "f",
       last_slide = "e",
       end_presentation = "q",
+      execute_code_blocks = "X",
+      close_execution_output = "x",
     },
     -- vim options that will be modified when in presentation mode
     -- you can pass any valid vim options here to customise how presentation mode behaves
@@ -101,6 +102,7 @@ These keymaps are active in normal mode when presenting a file. You can customis
 | `e` | move to the last slide               |
 | `q` | quit the presentation                |
 | `X` | execute the code blocks on the slide |
+| `x` | close the code execution output      |
 
 # Developing locally
 

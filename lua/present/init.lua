@@ -14,12 +14,13 @@ local state = {
       right_text = nil,
     },
     keymaps = {
-      execute_code_blocks = "X",
       previous_slide = "p",
       next_slide = "n",
       first_slide = "f",
       last_slide = "e",
       end_presentation = "q",
+      execute_code_blocks = "X",
+      close_execution_output = "x",
     },
     presentation_vim_options = {
       cmdheight = 0,
@@ -85,9 +86,9 @@ local function set_slide_content(idx)
 end
 
 local function set_presentation_keymaps()
-  local function set_keymap(mode, key, callback)
+  local function set_keymap(mode, key, callback, buffer_id)
     vim.keymap.set(mode, key, callback, {
-      buffer = state.floats.body.buf,
+      buffer = buffer_id,
     })
   end
 
@@ -96,26 +97,26 @@ local function set_presentation_keymaps()
   set_keymap("n", keymaps.previous_slide, function()
     state.current_slide = math.max(state.current_slide - 1, 1)
     set_slide_content(state.current_slide)
-  end)
+  end, state.floats.body.buf)
 
   set_keymap("n", keymaps.next_slide, function()
     state.current_slide = math.min(state.current_slide + 1, #state.slides)
     set_slide_content(state.current_slide)
-  end)
+  end, state.floats.body.buf)
 
   set_keymap("n", keymaps.first_slide, function()
     state.current_slide = 1
     set_slide_content(state.current_slide)
-  end)
+  end, state.floats.body.buf)
 
   set_keymap("n", keymaps.last_slide, function()
     state.current_slide = #state.slides
     set_slide_content(state.current_slide)
-  end)
+  end, state.floats.body.buf)
 
   set_keymap("n", keymaps.end_presentation, function()
     M.end_presentation()
-  end)
+  end, state.floats.body.buf)
 
   set_keymap("n", keymaps.execute_code_blocks, function()
     local blocks = state.slides[state.current_slide].blocks
@@ -128,8 +129,12 @@ local function set_presentation_keymaps()
     end
 
     local formatted_output = M.format_execution_output(execution_results)
-    windows.create_execution_result_window(formatted_output)
-  end)
+    local execution_float = windows.create_execution_result_window(formatted_output)
+
+    set_keymap("n", keymaps.close_execution_output, function()
+      vim.api.nvim_buf_delete(execution_float.buf, { force = true })
+    end, execution_float.buf)
+  end, state.floats.body.buf)
 end
 
 ---@param execution_results present.ExecutionResult[]

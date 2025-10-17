@@ -136,6 +136,8 @@ M.update_shown_floating_windows = function(floats, is_intro)
   vim.api.nvim_win_set_config(floats.intro.win, { hide = not is_intro })
 end
 
+---@param text string[]
+---@return present.Float
 M.create_execution_result_window = function(text)
   local windows = create_window_configurations()
   local float = create_floating_window(windows.execution, true)
@@ -143,6 +145,8 @@ M.create_execution_result_window = function(text)
   vim.bo[float.buf].filetype = "markdown"
   vim.wo[float.win].spell = false
   vim.api.nvim_buf_set_lines(float.buf, 0, -1, false, text)
+
+  return float
 end
 
 ---@param content_length number
