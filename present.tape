@@ -1,9 +1,9 @@
 Output assets/present.gif
 
 Set Framerate 25
-Set FontSize 20
-Set Width 1200
-Set Height 800
+Set FontSize 40
+Set Width 2400
+Set Height 1600
 Set Padding 40
 
 Env NVIM_APPNAME "nvim-demo"
